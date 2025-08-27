@@ -9,7 +9,8 @@ import EditIcon from '@mui/icons-material/Edit';
 import ViewIcon from '@mui/icons-material/RemoveRedEye';
 import { DataGrid, GridActionsCellItem, type GridColDef, type GridRowId } from '@mui/x-data-grid';
 
-import { Button, CircularProgress, Container } from '@mui/material';
+import { Box, Button, CircularProgress, Container } from '@mui/material';
+import config from '../../config';
 
 export default function ArticlesList() {
   const dispatch = useDispatch<AppDispatch>();
@@ -37,16 +38,16 @@ export default function ArticlesList() {
       field: 'image_url',
       headerName: 'Image',
       width: 120,
-      renderCell: params => {
-        return params.value.length > 2 ? (
-          <div style={{ width: 120, height: 80 }}>
+      renderCell: ({ value }) => {
+        return value ? (
+          <div style={{ width: 120, height: 80, marginLeft: -10 }}>
             <img
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              src={'http://localhost:8089' + params.value}
+              src={config.serverURL + value}
             />
           </div>
         ) : (
-          ''
+          'No image'
         );
       },
     },
@@ -90,11 +91,24 @@ export default function ArticlesList() {
 
   return (
     <Container>
-      <h2>Articles</h2>
-      <Button component={Link} to="/articles/new" variant="contained" color="primary">
-        Add Article
-      </Button>
-      <DataGrid rows={items} columns={columns} />
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          typography: 'body1',
+        }}
+      >
+        <h2>Articles</h2>
+        <Button component={Link} to="/articles/new" variant="contained" color="primary">
+          Create
+        </Button>
+      </Box>
+      <DataGrid
+        rows={items}
+        columns={columns}
+        getRowHeight={({ model }) => (model.image_url ? 80 : 40)}
+      />
     </Container>
   );
 }
