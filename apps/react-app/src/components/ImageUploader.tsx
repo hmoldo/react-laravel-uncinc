@@ -11,9 +11,7 @@ type ImageUploaderProps = {
 } & React.HTMLProps<HTMLInputElement>;
 
 const ImageUploader = ({ label, ...props }: ImageUploaderProps) => {
-  const fieldHookConfig = useField(props as FieldHookConfig<File | null>);
-  const meta = fieldHookConfig[1],
-    helpers = fieldHookConfig[2];
+  const [, meta, helpers] = useField(props as FieldHookConfig<File | null>);
   const { setValue } = helpers;
   const [preview, setPreview] = useState<string | null>(null);
 
