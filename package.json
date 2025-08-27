@@ -17,12 +17,12 @@
     ]
   },
   "scripts": {
-    "test-frontend": "pnpm --filter react-app run test",
-    "test-backend": "cd apps/laravel-api && ./vendor/bin/sail artisan test",
-    "test": "pnpm test-frontend && pnpm test-backend",
     "lint-frontend": "pnpm --filter react-app run lint",
     "lint-backend": "cd apps/laravel-api && ./vendor/bin/pint",
     "lint": "pnpm lint-frontend && pnpm lint-backend",
+    "test-frontend": "pnpm --filter react-app run test",
+    "test-backend": "cd apps/laravel-api && ./vendor/bin/sail artisan test",
+    "test": "pnpm test-frontend && pnpm test-backend",
     "prepare": "husky"
   },
   "devDependencies": {
