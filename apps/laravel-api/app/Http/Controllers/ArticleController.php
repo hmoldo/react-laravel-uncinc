@@ -3,19 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Models\Article;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request; // Import JsonResponse for explicit return types
+use App\Http\Resources\ArticleResource;
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse; // Import JsonResponse for explicit return types
 
 class ArticleController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(): array
     {
-        $articles = Article::all(); // Retrieve all articles
-
-        return response()->json($articles);
+        // $articles = Article::all(); // Retrieve all articles
+        // return response()->json($articles);
+        $resp = ArticleResource::collection(Article::all());
+        return $resp->resolve();
     }
 
     /**
@@ -29,14 +31,13 @@ class ArticleController extends Controller
             'content' => 'required|string',
             'author' => '',
             //
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:4096',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:4096'
         ]);
 
         $imagePath = $request->file('image')->store('articles', 'public');
         $validatedData['image'] = $imagePath;
 
         $article = Article::create($validatedData); // Create a new article
-
         return response()->json($article, 201); // 201 Created status
     }
 
@@ -60,7 +61,6 @@ class ArticleController extends Controller
         ]);
 
         $article->update($validatedData); // Update the article
-
         return response()->json($article);
     }
 
@@ -70,7 +70,6 @@ class ArticleController extends Controller
     public function destroy(Article $article): JsonResponse // Route model binding
     {
         $article->delete(); // Delete the article
-
         return response()->json(null, 204); // 204 No Content status
     }
 }
