@@ -1,16 +1,19 @@
 {
   "name": "react-laravel-harry",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "private": true,
+  "description": "A monorepo for a React frontend and Laravel API backend.",
+  "author": "Harry Moldovanis",
+  "license": "MIT",
+  "packageManager": "pnpm@10.15.0",
+  "workspaces": [
+    "apps/laravel-api",
+    "apps/react-app"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepare": "husky"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "packageManager": "pnpm@10.15.0",
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^19.8.1",
