@@ -10,13 +10,27 @@
     "apps/laravel-api",
     "apps/react-app"
   ],
+  "lint-staged": {
+    "apps/react-app/**/*.{ts,tsx}": [
+      "pnpm lint --workspace=apps/react-app",
+      "pnpm test --workspace=apps/react-app -- --findRelatedTests"
+    ],
+    "apps/laravel-api/**/*.php": [
+      "cd apps/laravel-api && ./vendor/bin/php-cs-fixer fix --diff",
+      "cd apps/laravel-api && ./vendor/bin/sail artisan test"
+    ]
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "lint-frontend": "pnpm --filter react-app run lint",
+    "lint-backend": "cd apps/laravel-api && ./vendor/bin/php-cs-fixer fix --dry-run --diff",
+    "lint": "pnpm --filter react-app run lint && cd apps/laravel-api && ./vendor/bin/php-cs-fixer fix --dry-run --diff",
     "prepare": "husky"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^19.8.1",
-    "husky": "^9.1.7"
+    "husky": "^9.1.7",
+    "lint-staged": "^16.1.5"
   }
 }
