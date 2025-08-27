@@ -1,0 +1,31 @@
+# IDEs and OS-specific files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Node.js dependencies
+node_modules/
+.npm/
+
+# Laravel-specific directories and files
+/apps/laravel-api/vendor/
+/apps/laravel-api/public/storage/
+/apps/laravel-api/.env
+/apps/laravel-api/.env.*
+/apps/laravel-api/storage/
+/apps/laravel-api/bootstrap/cache/
+
+# Laravel-specific OS files
+/apps/laravel-api/.phpunit.result.cache
+
+# React-specific directories and files
+/apps/react-app/dist/
+/apps/react-app/build/
+/apps/react-app/.env
+/apps/react-app/.env.*
+
+# Monorepo-specific files
+npm-debug.log
+yarn-debug.log*
+.pnpm-store/
