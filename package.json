@@ -6,25 +6,23 @@
   "author": "Harry Moldovanis",
   "license": "MIT",
   "packageManager": "pnpm@10.15.0",
-  "workspaces": [
-    "apps/laravel-api",
-    "apps/react-app"
-  ],
   "lint-staged": {
     "apps/react-app/**/*.{ts,tsx}": [
-      "pnpm lint --workspace=apps/react-app",
-      "pnpm test --workspace=apps/react-app -- --findRelatedTests"
+      "pnpm --filter react-app run lint",
+      "pnpm --filter react-app run test -- --findRelatedTests"
     ],
     "apps/laravel-api/**/*.php": [
-      "cd apps/laravel-api && ./vendor/bin/php-cs-fixer fix --diff",
+      "cd apps/laravel-api && ./vendor/bin/pint",
       "cd apps/laravel-api && ./vendor/bin/sail artisan test"
     ]
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test-frontend": "pnpm --filter react-app run test",
+    "test-backend": "cd apps/laravel-api && ./vendor/bin/sail artisan test",
+    "test": "pnpm test-frontend && pnpm test-backend",
     "lint-frontend": "pnpm --filter react-app run lint",
-    "lint-backend": "cd apps/laravel-api && ./vendor/bin/php-cs-fixer fix --dry-run --diff",
-    "lint": "pnpm --filter react-app run lint && cd apps/laravel-api && ./vendor/bin/php-cs-fixer fix --dry-run --diff",
+    "lint-backend": "cd apps/laravel-api && ./vendor/bin/pint",
+    "lint": "pnpm lint-frontend && pnpm lint-backend",
     "prepare": "husky"
   },
   "devDependencies": {
