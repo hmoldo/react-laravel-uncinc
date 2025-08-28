@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "./vendor/bin/sail up",
+    "build": "composer install --no-dev --optimize-autoloader && php artisan migrate --force && php artisan config:cache",
     "down": "./vendor/bin/sail down",
     "test": "./vendor/bin/sail artisan test"
   },
