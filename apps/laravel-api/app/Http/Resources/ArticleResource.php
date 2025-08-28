@@ -15,12 +15,14 @@ class ArticleResource extends JsonResource
      */
     public function toArray($request): array
     {
+        $path = '/storage/images/';
+        $image = Storage::url($this->image);
         return [
             'id' => $this->id,
             'title' => $this->title,
             'author' => $this->author,
             'content' => $this->content,
-            'image_url' => Storage::url($this->image), // Add the URL here
+            'image' => $this->image ? substr($image, strlen($path)) : null, // Add the URL here
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

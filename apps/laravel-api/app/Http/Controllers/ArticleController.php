@@ -29,13 +29,16 @@ class ArticleController extends Controller
         $validatedData = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
-            'author' => '',
-            //
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:4096'
+            'author' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:8000'
         ]);
 
-        $imagePath = $request->file('image')->store('articles', 'public');
-        $validatedData['image'] = $imagePath;
+        // Check if an image was uploaded
+        if ($request->hasFile('image')) {
+            // Store the file in the 'public' disk under the 'images' folder
+            $imagePath = $request->file('image')->store('images', 'public');
+            $validatedData['image'] = $imagePath;
+        }
 
         $article = Article::create($validatedData); // Create a new article
         return response()->json($article, 201); // 201 Created status
@@ -54,12 +57,21 @@ class ArticleController extends Controller
      */
     public function update(Request $request, Article $article): JsonResponse // Route model binding
     {
+        // dd($article);
         // Validate incoming request data
         $validatedData = $request->validate([
-            'title' => 'sometimes|required|string|max:255',
-            'content' => 'sometimes|required|string',
+            'title' => 'sometimes|string|max:255',
+            'content' => 'sometimes|string',
+            'author' => 'sometimes|nullable|string',
+            'image' => 'sometimes|nullable|image|mimes:jpeg,png,jpg,gif|max:8000'
         ]);
+        // dd($validatedData);
 
+        if ($request->hasFile('image')) {
+            // Store the file in the 'public' disk under the 'images' folder
+            $imagePath = $request->file('image')->store('images', 'public');
+            $validatedData['image'] = $imagePath;
+        }
         $article->update($validatedData); // Update the article
         return response()->json($article);
     }

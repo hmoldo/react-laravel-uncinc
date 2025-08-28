@@ -11,6 +11,7 @@ import { DataGrid, GridActionsCellItem, type GridColDef, type GridRowId } from '
 
 import { Box, Button, CircularProgress, Container } from '@mui/material';
 import config from '../../config';
+const imagePath = config.serverURL + '/storage/images/';
 
 export default function ArticlesList() {
   const dispatch = useDispatch<AppDispatch>();
@@ -35,7 +36,7 @@ export default function ArticlesList() {
 
   const columns: GridColDef[] = [
     {
-      field: 'image_url',
+      field: 'image',
       headerName: 'Image',
       width: 120,
       renderCell: ({ value }) => {
@@ -43,7 +44,7 @@ export default function ArticlesList() {
           <div style={{ width: 120, height: 80, marginLeft: -10 }}>
             <img
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              src={config.serverURL + value}
+              src={imagePath + value}
             />
           </div>
         ) : (
@@ -107,7 +108,7 @@ export default function ArticlesList() {
       <DataGrid
         rows={items}
         columns={columns}
-        getRowHeight={({ model }) => (model.image_url ? 80 : 40)}
+        getRowHeight={({ model }) => (model.image ? 80 : 40)}
       />
     </Container>
   );

@@ -30,7 +30,12 @@ export default function ArticleEdit() {
         if (!article) {
           await dispatch(createArticle(values));
         } else {
-          await dispatch(updateArticle({ ...article, ...values }));
+          await dispatch(
+            updateArticle({
+              id: article.id,
+              article: values,
+            })
+          );
         }
         navigate('/');
       }}

@@ -18,9 +18,10 @@ export default function ArticleForm({ initialValues, onSubmit }: ArticleFormProp
   ) => {
     const { setSubmitting } = formikHelpers;
     const formData = new FormData();
-    const { id } = initialValues;
     // Append all form values
-    if (id) formData.append('id', id + '');
+    if (values.id) {
+      formData.append('_method', 'patch');
+    }
     formData.append('title', values.title);
     formData.append('author', values.author);
     formData.append('content', values.content);
