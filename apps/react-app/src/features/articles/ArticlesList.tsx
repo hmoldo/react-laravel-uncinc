@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import type { AppDispatch, RootState } from '../../app/store';
@@ -11,11 +11,14 @@ import { DataGrid, GridActionsCellItem, type GridColDef, type GridRowId } from '
 
 import { Box, Button, CircularProgress, Container } from '@mui/material';
 import config from '../../config';
+import DialogConfirm from '../../components/DialogConfirm';
 const { IMG_URL } = config;
 
 export default function ArticlesList() {
   const dispatch = useDispatch<AppDispatch>();
   const { items, loading } = useSelector((state: RootState) => state.articles);
+  const [openDelete, setOpenDelete] = useState(false);
+  const [deleteID, setDeleteID] = useState<number | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -30,8 +33,20 @@ export default function ArticlesList() {
   const handleEditClick = (id: GridRowId) => () => {
     navigate(`/articles/${id}/edit`);
   };
+
   const handleDeleteClick = (id: GridRowId) => () => {
-    dispatch(deleteArticle(id as number));
+    setOpenDelete(true);
+    setDeleteID(id as number);
+    // dispatch(deleteArticle(id as number));
+  };
+  const handleCancelDelete = () => {
+    setOpenDelete(false);
+    setDeleteID(null);
+  };
+  const handleConfirmDelete = () => {
+    if (deleteID) dispatch(deleteArticle(deleteID));
+    setOpenDelete(false);
+    setDeleteID(null);
   };
 
   const columns: GridColDef[] = [
@@ -113,6 +128,11 @@ export default function ArticlesList() {
 
   return (
     <Container>
+      <DialogConfirm
+        open={openDelete}
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+      />
       <Box
         sx={{
           display: 'flex',
