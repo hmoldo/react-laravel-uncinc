@@ -17,7 +17,7 @@
     ]
   },
   "scripts": {
-    "dev-backend": "pnpm --filter laravel-api run up",
+    "dev-backend": "pnpm --filter laravel-api run dev",
     "dev-frontend": "pnpm --filter react-app run dev",
     "dev": "pnpm -r --parallel dev",
     "build:backend": "pnpm --filter laravel-api build",
@@ -29,6 +29,7 @@
     "test-frontend": "pnpm --filter react-app run test",
     "test-backend": "cd apps/laravel-api && ./vendor/bin/sail artisan test",
     "test": "pnpm test-frontend && pnpm test-backend",
+    "setup-backend": "pnpm --filter laravel-api run setup",
     "prepare": "husky"
   },
   "devDependencies": {
