@@ -1,0 +1,178 @@
+name: Monorepo CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'apps/react-app/**'
+      - 'apps/laravel-api/**'
+      - '.github/workflows/ci.yml' # Trigger if the workflow file itself changes
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'apps/react-app/**'
+      - 'apps/laravel-api/**'
+      - '.github/workflows/ci.yml'
+
+jobs:
+  # ------------------------------------
+  # Frontend (React Vite) CI Job
+  # ------------------------------------
+  frontend-ci:
+    name: React Frontend CI
+    runs-on: ubuntu-latest
+
+    # Only run this job if changes are detected in the React app directory
+    # or if the workflow file changes, ensuring efficient use of resources.
+    if: |
+      github.event_name == 'push' && (
+        contains(toJson(github.event.commits.*.modified), 'apps/react-app/') ||
+        contains(toJson(github.event.commits.*.added), 'apps/react-app/') ||
+        contains(toJson(github.event.commits.*.removed), 'apps/react-app/') ||
+        contains(toJson(github.event.commits.*.modified), '.github/workflows/ci.yml')
+      ) ||
+      github.event_name == 'pull_request' && (
+        contains(toJson(github.event.pull_request.files.*.filename), 'apps/react-app/') ||
+        contains(toJson(github.event.pull_request.files.*.filename), '.github/workflows/ci.yml')
+      )
+
+    defaults:
+      run:
+        working-directory: apps/react-app # All commands in this job will run from this directory
+
+    steps:
+      - name: Checkout Code 🛎️
+        uses: actions/checkout@v4 # Action to check out your repository code
+
+      - name: Setup Node.js Environment 🟢
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # Specify the Node.js version for your React app
+          cache: 'pnpm' # Cache pnpm dependencies to speed up subsequent runs
+
+      - name: Install pnpm Dependencies 📦
+        # Installs dependencies for the React app using pnpm.
+        # pnpm's monorepo features handle linked packages efficiently.
+        run: pnpm install --frozen-lockfile
+
+      - name: Run Frontend Tests 🧪
+        # Executes the test script defined in apps/react-app/package.json
+        run: pnpm test
+
+      - name: Build Frontend for Production 🏗️
+        # Creates a production-ready build of your React app.
+        # This typically outputs to a 'dist' or 'build' folder.
+        run: pnpm build
+
+  # ------------------------------------
+  # Backend (Laravel Sail) CI Job
+  # ------------------------------------
+  backend-ci:
+    name: Laravel Backend CI
+    runs-on: ubuntu-latest
+
+    # Only run this job if changes are detected in the Laravel API directory
+    # or if the workflow file changes.
+    if: |
+      github.event_name == 'push' && (
+        contains(toJson(github.event.commits.*.modified), 'apps/laravel-api/') ||
+        contains(toJson(github.event.commits.*.added), 'apps/laravel-api/') ||
+        contains(toJson(github.event.commits.*.removed), 'apps/laravel-api/') ||
+        contains(toJson(github.event.commits.*.modified), '.github/workflows/ci.yml')
+      ) ||
+      github.event_name == 'pull_request' && (
+        contains(toJson(github.event.pull_request.files.*.filename), 'apps/laravel-api/') ||
+        contains(toJson(github.event.pull_request.files.*.filename), '.github/workflows/ci.yml')
+      )
+
+    defaults:
+      run:
+        working-directory: apps/laravel-api # All commands in this job will run from this directory
+
+    services:
+      mysql:
+        image: mysql/mysql-server:8.0 # Use a MySQL service for database interactions
+        env:
+          MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }} # Use GitHub Secrets for sensitive info
+          MYSQL_DATABASE: your_db_test
+          MYSQL_USER: sail
+          MYSQL_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - name: Checkout Code 🛎️
+        uses: actions/checkout@v4
+
+      - name: Setup PHP Environment 🐘
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3' # Specify your Laravel project's PHP version
+          extensions: mbstring, pdo_mysql, dom, filter, gd, json, session, xml, zip # Common extensions
+          ini-values: post_max_size=256M, upload_max_filesize=256M
+          coverage: none # Disable Xdebug or PCOV if not needed for CI speed
+
+      - name: Copy .env.ci to .env 📄
+        # Create an .env file from a .env.ci template for CI-specific configurations,
+        # especially for database connections that point to the 'mysql' service.
+        run: cp .env.ci .env
+
+      - name: Install Composer Dependencies 📦
+        # Installs PHP dependencies. Using --no-dev and --optimize-autoloader for production-like setup.
+        run: composer install --no-dev --optimize-autoloader
+
+      - name: Generate Application Key 🔑
+        # Laravel requires an application key.
+        run: php artisan key:generate
+
+      - name: Wait for MySQL to be ready ⏳
+        # Ensures the MySQL service is up and healthy before proceeding.
+        run: |
+          for i in $(seq 1 10); do
+            php artisan db:test && break
+            echo "Waiting for MySQL to start..."
+            sleep 5
+          done
+
+      - name: Run Database Migrations ⬆️
+        # Migrates the database for testing. Use --force in non-interactive environments.
+        # Consider using a temporary SQLite database for tests for faster CI.
+        run: php artisan migrate --force
+
+      - name: Run Backend Tests 🧪
+        # Executes Laravel tests using Sail's Artisan command.
+        # This leverages the Docker environment defined by Sail.
+        run: ./vendor/bin/sail artisan test
+
+  # ------------------------------------
+  # Optional: Deployment Jobs (Conceptual)
+  # ------------------------------------
+  # frontend-cd:
+  #   name: Deploy React Frontend
+  #   needs: [frontend-ci] # Depends on successful frontend CI
+  #   runs-on: ubuntu-latest
+  #   environment: production # Or staging
+  #   steps:
+  #     - name: Download Build Artifact
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: react-build-artifact # Name of the artifact saved from frontend-ci
+  #         path: ./deploy/react-app # Path to store the downloaded artifact
+  #     - name: Deploy to Hosting Provider
+  #       # Example: Deploy to S3, Vercel, Netlify, etc. using a specific action or script.
+  #       run: echo "Deployment script for React app"
+
+  # backend-cd:
+  #   name: Deploy Laravel Backend
+  #   needs: [backend-ci] # Depends on successful backend CI
+  #   runs-on: ubuntu-latest
+  #   environment: production # Or staging
