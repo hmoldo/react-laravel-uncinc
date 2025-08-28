@@ -11,7 +11,7 @@ import { DataGrid, GridActionsCellItem, type GridColDef, type GridRowId } from '
 
 import { Box, Button, CircularProgress, Container } from '@mui/material';
 import config from '../../config';
-const imagePath = config.serverURL + '/storage/images/';
+const { IMG_URL } = config;
 
 export default function ArticlesList() {
   const dispatch = useDispatch<AppDispatch>();
@@ -41,11 +41,32 @@ export default function ArticlesList() {
       width: 120,
       renderCell: ({ value }) => {
         return value ? (
-          <div style={{ width: 120, height: 80, marginLeft: -10 }}>
-            <img
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              src={imagePath + value}
-            />
+          <div
+            style={{
+              display: 'flex',
+              placeItems: 'center',
+
+              marginLeft: -10,
+              width: 120,
+              height: 80,
+              position: 'relative',
+            }}
+          >
+            <figure
+              style={{
+                display: 'block',
+                margin: 4,
+                padding: 0,
+                borderRadius: 4,
+                overflow: 'hidden',
+                height: 72,
+              }}
+            >
+              <img
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                src={IMG_URL + value}
+              />
+            </figure>
           </div>
         ) : (
           'No image'

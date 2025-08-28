@@ -49,7 +49,7 @@ class ArticleController extends Controller
      */
     public function show(Article $article): JsonResponse // Route model binding
     {
-        return response()->json($article);
+        return response()->json(new ArticleResource($article));
     }
 
     /**

@@ -3,7 +3,7 @@ import type { DataModel } from '@toolpad/core';
 import axios from 'axios';
 import config from '../../config';
 
-const API_URL = config.serverURL + '/api/articles';
+const { API_URL } = config;
 
 export interface Article extends DataModel {
   id: number;

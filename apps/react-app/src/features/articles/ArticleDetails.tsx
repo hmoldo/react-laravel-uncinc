@@ -4,6 +4,7 @@ import axios from 'axios';
 import type { Article } from './articlesSlice';
 import { Container, Typography, Button, Box } from '@mui/material';
 import config from '../../config';
+const { API_URL, IMG_URL } = config;
 
 export default function ArticleDetails() {
   const { id } = useParams<{ id: string }>();
@@ -11,7 +12,7 @@ export default function ArticleDetails() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get(config.serverURL + `/api/articles/${id}`).then(res => setArticle(res.data));
+    axios.get(API_URL + `/${id}`).then(res => setArticle(res.data));
   }, [id]);
 
   if (!article) return <p>Loading...</p>;
@@ -23,13 +24,25 @@ export default function ArticleDetails() {
   return (
     <Container sx={{ padding: 2 }}>
       <Box sx={{ display: 'flex', gap: 4, paddingBottom: 4 }}>
-        <Box sx={{ flex: 1 }}>
-          <Typography variant="h4" textTransform="uppercase">
-            {article.title}
-          </Typography>
-          <Typography>{article.content}</Typography>
+        <Box sx={{ flex: 1, flexGrow: 1 }}>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              minHeight: '100%',
+            }}
+          >
+            <div>
+              <Typography variant="h4" textTransform="uppercase">
+                {article.title}
+              </Typography>
+              <Typography>{article.content}</Typography>
+            </div>
+          </div>
+          {!!article.author && <Typography fontStyle="italic">By: {article.author}</Typography>}
         </Box>
-        {!!article.image_url && (
+        {!!article.image && (
           <Box
             component="img"
             sx={{
@@ -39,7 +52,7 @@ export default function ArticleDetails() {
               aspectRatio: '16/9',
               borderRadius: 8,
             }}
-            src={config.serverURL + article.image_url}
+            src={IMG_URL + article.image}
           />
         )}
       </Box>
