@@ -1,5 +1,5 @@
 import { Box, Button, TextField } from '@mui/material';
-import { Formik } from 'formik';
+import { Formik, type FormikHelpers } from 'formik';
 import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import ImageUploader from '../../components/ImageUploader';
@@ -7,14 +7,20 @@ import type { ArticleInitialValues } from './articlesSlice';
 
 interface ArticleFormProps {
   initialValues: ArticleInitialValues;
-  onSubmit: (values: ArticleInitialValues) => void;
+  onSubmit: (values: FormData) => void;
 }
 
 export default function ArticleForm({ initialValues, onSubmit }: ArticleFormProps) {
   const navigate = useNavigate();
-  const handleSubmit = async (values: ArticleInitialValues, { setSubmitting }) => {
+  const handleSubmit = async (
+    values: ArticleInitialValues,
+    formikHelpers: FormikHelpers<ArticleInitialValues>
+  ) => {
+    const { setSubmitting } = formikHelpers;
     const formData = new FormData();
+    const { id } = initialValues;
     // Append all form values
+    if (id) formData.append('id', id + '');
     formData.append('title', values.title);
     formData.append('author', values.author);
     formData.append('content', values.content);
