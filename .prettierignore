@@ -1,0 +1,6 @@
+# .prettierignore
+node_modules
+vendor
+build
+dist
+.env
