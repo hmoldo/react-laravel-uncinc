@@ -7,11 +7,32 @@ use App\Http\Resources\ArticleResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse; // Import JsonResponse for explicit return types
 
+use OpenApi\Attributes as OA;
+
+#[OA\Info(
+    version: "1.0.0",
+    title: "My Awesome API"
+)]
+#[OA\Server(
+    url: "http://localhost:8000/api/v1",
+    description: "Local API server"
+)]
 class ArticleController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
+    #[OA\Get(
+        path: "/api/articles",
+        summary: "Get a list of all articles",
+        tags: ["Articles"],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "A list of articles"
+            ),
+        ]
+    )]
     public function index(): array
     {
         // $articles = Article::all(); // Retrieve all articles
@@ -21,7 +42,7 @@ class ArticleController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Get all users.
      */
     public function store(Request $request): JsonResponse
     {
