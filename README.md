@@ -43,17 +43,22 @@ This repository contains a monorepo setup with a React frontend and a Laravel ba
    pnpm up
    ```
 
-3. Run migrations and seeders:
+3. Upgrade composer:
+   ```bash
+   ./vendor/bin/sail composer self-update
+   ```
+
+4. Run migrations and seeders:
    ```bash
    ./vendor/bin/sail artisan migrate --seed
    ```
 
-4. Enable and set storage permissions:
+5. Enable and set storage permissions:
    ```bash
    ./vendor/bin/sail artisan storage:link
    ```
 
-5. Stop docker Sail:
+6. Stop docker Sail:
    ```bash
    pnpm down
    ```
